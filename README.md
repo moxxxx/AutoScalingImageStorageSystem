@@ -46,7 +46,7 @@ The Auto Scaling Image Storage System is designed to provide a scalable and reli
 
 The Elastic Image Storage System architecture leverages the Flask components for user interaction and image management, AWS EC2 instances for hosting these components, RDS for database storage, S3 for image storage, and CloudWatch for monitoring system health. The Autoscaler Flask App ensures the system dynamically adapts to varying workloads by managing the number of Memcache Flask Apps.
 
-![System Architecture](architecture-diagram.png)
+![System Architecture](images/system_architecture.png)
 
 ## 4. Getting Started
 

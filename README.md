@@ -111,6 +111,9 @@ Figure 3: Two new memcache nodes are added, C and D. Now, there are four memcach
 ## 8. Contributors
 
 Elastic Image Storage System is extended upon the ECE1779 Assignment 1 (Image Storage System)
+
 Jiujiu Duan: S3 functionality, CloudWatch, AutoScaler, Memcache
+
 Liangjing Xie: Web GUI Flask app, Manager UI Flask app, RDS
+
 Chaoyue Gong: Deployment

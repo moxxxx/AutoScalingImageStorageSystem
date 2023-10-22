@@ -70,7 +70,11 @@ CloudWatch is used for monitoring the health and performance of the Memcache Fla
 AutoScaling Image Storage System employs a simplified form of consistent hashing that does not guarantee identical characteristics as the original version.
 
 In the simplified consistent hashing approach, the entire range of possible key values is divided into 16 equally sized segments using MD5 hashing. The complete MD5 hash range spans from 0 to 2^128 - 1 in decimal, or 0 to FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF in hexadecimal. To create 16 equally sized partitions within this hash range, it is essential to calculate the boundaries for each partition. In a hex representation, these 16 partitions can be defined as follows:
+
+
                 Range beginning (hexadecimal)           Range end (hexadecimal)
+
+
 Partition 1	:   0	                                    FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 Partition 2	:   10000000000000000000000000000000	    1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 Partition 3	:   20000000000000000000000000000000	    2FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
@@ -88,6 +92,7 @@ Partition 14:	D0000000000000000000000000000000	    DFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 Partition 15:	E0000000000000000000000000000000	    EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 Partition 16:	F0000000000000000000000000000000	    FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
+
 For example: 
 
 Given key "k1", we calculate its MD5 hash: B637B17AF08ACED8850C18CCCDE915DA. This hash would fall into Partition 12.
@@ -95,12 +100,11 @@ Given key "k2", we calculate its MD5 hash: 61620957A1443C946A143CF99A7D24FA. Thi
 Once we have the 16 partitions, we can assign different partitions to different memcache nodes. The following three figures illustrate the assignment of partitions to nodes for 1, 2, and 4 nodes. Take note of the alternating pattern that partitions are assigned to nodes.
 
 ![Figure 1](images/f1.png)
+
 Figure 1: One memcache node exits, A. All of the 16 partitions are assigned to memchache node A, meaning that A is responsible for all possible key values, and all requests are routed to A. 
 
-![Figure 2](images/f2.png)
 Figure 2: A new memcache node is added, B. Now there are two memcache nodes, A and B. The 16 key partitions are divided between memcache nodes A and B, equally, using an alternating pattern. Now, approximately half of the requests should be routed to A, and half to B, depending on which node the key in the request has been assigned to. 
 
-![Figure 3](images/f3.png)
 Figure 3: Two new memcache nodes are added, C and D. Now, there are four memcache nodes, A, B, C, D. The 16 partitions are re-divided between all four nodes, such that each node is responsible for one fourth of the possible key values. Approximately one fourth of all requests should be routed to each node. 
 
 

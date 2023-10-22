@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Assignment1 Group22</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+
+    <style>
+        body {
+            padding-top: 50px;
+        }
+
+        .starter {
+            padding: 40px 15px;
+        }
+
+        .nav-item {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        a, .a:hover {
+            transition: all 0.2s;
+        }
+
+        .container-fluid {
+            width: 94%;
+            margin: 0px auto;
+            max-width: 94%;
+        }
+
+        .fixed-top {
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+    </style>
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg bg-body-tertiary navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
+                aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarScroll">
+            <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('main') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('show_statistics') }}">Statistics</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul class=flashes>
+            <div class="alert alert-warning alert-dark alert-dismissible fade show" style="margin: 30px 55px 0px 20px"
+                 role="alert">
+                <strong>{{ messages[0][1] }}</strong> {{ messages[0][0] }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </ul>
+    {% endif %}
+{% endwith %}
+
+<div class="container">
+    <div class="starter">
+        <h1 style="font-weight: bold">Manager App</h1>
+        <p class="lead">Current nodes number: {{ node_num }}</p>
+    </div>
+</div>
+
+<div class="container">
+
+    {% if mode == 'auto' %}
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked"
+                   onclick="location.href={{ url_for('change_mode') }}" checked>
+            <label class="form-check-label" for="flexSwitchCheckChecked" style="font-weight: bold">Automatic
+                Mode</label>
+        </div>
+        <div class="input-group-sm mb-3 row">
+            <label type="text" class="form-label">Max Miss Rate threshold:<b> {{ max_missrate }} </b></label>
+            <label type="text" class="form-label">Min Miss Rate threshold:<b> {{ min_missrate }} </b></label>
+            <label type="text" class="form-label">Ratio by which to expand the pool:<b> {{ expand_ratio }} </b></label>
+            <label type="text" class="form-label">Ratio by which to shrink the pool:<b> {{ shrink_ratio }} </b></label>
+        </div>
+        <form action="{{ url_for('update_policy') }}" method="post" enctype="multipart/form-data">
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Max Miss Rate threshold:</span>
+                <input type="text" class="form-control" aria-label="Sizing example input"
+                       aria-describedby="inputGroup-sizing-sm" name="max_missrate" required>
+            </div>
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Min Miss Rate threshold:</span>
+                <input type="text" class="form-control" aria-label="Sizing example input"
+                       aria-describedby="inputGroup-sizing-sm" name="min_missrate" required>
+            </div>
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Ratio by which to expand the pool:</span>
+                <input type="text" class="form-control" aria-label="Sizing example input"
+                       aria-describedby="inputGroup-sizing-sm" name="expand_ratio" required>
+            </div>
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Ratio by which to shrink the pool:</span>
+                <input type="text" class="form-control" aria-label="Sizing example input"
+                       aria-describedby="inputGroup-sizing-sm" name="shrink_ratio" required>
+            </div>
+            <button type="submit" class="btn btn-outline-secondary"
+                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">Update
+                Auto-scaling Policy
+            </button>
+        <br>
+        </form>
+    {% endif %}
+
+    {% if mode == 'manual' %}
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked"
+                   onclick="location.href={{ url_for('change_mode') }}">
+            <label class="form-check-label" for="flexSwitchCheckChecked" style="font-weight: bold">Automatic
+                Mode</label>
+        </div>
+        <form method="post" action="{{ url_for('manual_shrink_pool_size') }}" style="margin:0px; display:inline">
+            <button type="submit" class="btn btn-outline-secondary"
+                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">Shrink
+                Pool Size (-1)
+            </button>
+        </form>
+        <form method="post" action="{{ url_for('manual_grow_pool_size') }}" style="margin:0px; display:inline">
+            <button type="submit" class="btn btn-outline-secondary"
+                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">Grow Pool
+                Size (+1)
+            </button>
+        </form>
+    {% endif %}
+
+    <table class="table table-striped-columns caption-top">
+        <thead>
+        <tr>
+            <th scope="col">Node</th>
+            <th scope="col">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for ec2 in ec2_list %}
+            <tr>
+                <th scope="row">{{ ec2 }}</th>
+                <td>{{ status_list[loop.index0] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

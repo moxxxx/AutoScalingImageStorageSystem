@@ -1,0 +1,15 @@
+METADATA_TABLE = "metadata"
+IMAGE_PATHS_TABLE = "image_paths"
+STATIS_TABLE = "statis"
+
+STATIS_KEY_ID = "statis_id"
+STATIS_KEY_TIME = "statis_time"
+STATIS_KEY_NUM_ITEMS = "num_items"
+STATIS_KEY_TOTAL_SIZE = "total_size"
+STATIS_KEY_TOTAL_REQUEST = "total_request"
+STATIS_KEY_MISS_RATE = "miss_rate"
+STATIS_KEY_HIT_RATE = "hit_rate"
+
+MEMCACHE_CAPACITY = "memcache.capacity"
+MEMCACHE_POLICY = "memcache.policy"
+FRONTEND_NEXT_PATH_ID = "frontend.next_path_id"

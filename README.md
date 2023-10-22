@@ -13,6 +13,7 @@ The Elastic Image Storage System is a scalable and efficient image storage and m
 5. [Configuration](#configuration)
 6. [Usage](#usage)
 7. [Monitoring and Scaling](#monitoring-and-scaling)
+8. [Contributors](#contributors)
 
 ## 1. Introduction
 
@@ -65,3 +66,47 @@ Detailed usage instructions can be found in the README files for each Flask comp
 ## 7. Monitoring and Scaling
 
 CloudWatch is used for monitoring the health and performance of the Memcache Flask Apps. The Autoscaler Flask App ensures that the system scales dynamically to handle varying workloads.
+
+AutoScaling Image Storage System employs a simplified form of consistent hashing that does not guarantee identical characteristics as the original version.
+
+In the simplified consistent hashing approach, the entire range of possible key values is divided into 16 equally sized segments using MD5 hashing. The complete MD5 hash range spans from 0 to 2^128 - 1 in decimal, or 0 to FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF in hexadecimal. To create 16 equally sized partitions within this hash range, it is essential to calculate the boundaries for each partition. In a hex representation, these 16 partitions can be defined as follows:
+                Range beginning (hexadecimal)           Range end (hexadecimal)
+Partition 1	:   0	                                    FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 2	:   10000000000000000000000000000000	    1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 3	:   20000000000000000000000000000000	    2FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 4	:   30000000000000000000000000000000	    3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 5	:   40000000000000000000000000000000	    4FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 6	:   50000000000000000000000000000000	    5FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 7	:   60000000000000000000000000000000	    6FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 8	:   70000000000000000000000000000000	    7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 9	:   80000000000000000000000000000000	    8FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 10:	90000000000000000000000000000000	    9FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 11:	A0000000000000000000000000000000	    AFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 12:	B0000000000000000000000000000000	    BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 13:	C0000000000000000000000000000000	    CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 14:	D0000000000000000000000000000000	    DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 15:	E0000000000000000000000000000000	    EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+Partition 16:	F0000000000000000000000000000000	    FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
+For example: 
+
+Given key "k1", we calculate its MD5 hash: B637B17AF08ACED8850C18CCCDE915DA. This hash would fall into Partition 12.
+Given key "k2", we calculate its MD5 hash: 61620957A1443C946A143CF99A7D24FA. This hash would fall into Partition 7. 
+Once we have the 16 partitions, we can assign different partitions to different memcache nodes. The following three figures illustrate the assignment of partitions to nodes for 1, 2, and 4 nodes. Take note of the alternating pattern that partitions are assigned to nodes.
+
+![Figure 1](images/f1.png)
+Figure 1: One memcache node exits, A. All of the 16 partitions are assigned to memchache node A, meaning that A is responsible for all possible key values, and all requests are routed to A. 
+
+![Figure 2](images/f2.png)
+Figure 2: A new memcache node is added, B. Now there are two memcache nodes, A and B. The 16 key partitions are divided between memcache nodes A and B, equally, using an alternating pattern. Now, approximately half of the requests should be routed to A, and half to B, depending on which node the key in the request has been assigned to. 
+
+![Figure 3](images/f3.png)
+Figure 3: Two new memcache nodes are added, C and D. Now, there are four memcache nodes, A, B, C, D. The 16 partitions are re-divided between all four nodes, such that each node is responsible for one fourth of the possible key values. Approximately one fourth of all requests should be routed to each node. 
+
+
+## 8. Contributors
+
+Elastic Image Storage System is extended upon the ECE1779 Assignment 1 (Image Storage System)
+Jiujiu Duan: S3 functionality, CloudWatch, AutoScaler, Memcache
+Liangjing Xie: Web GUI Flask app, Manager UI Flask app, RDS
+Chaoyue Gong: Deployment
